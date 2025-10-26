@@ -9,7 +9,7 @@ static int fb_width = 0;
 static int fb_height = 0;
 static Cursor* current_cursor = nullptr;
 
-// Função interna para desenhar um frame com alpha blending simples
+// Desenha frame do cursor com alpha blending simples
 static void draw_frame(const CursorFrame& frame, int x, int y) {
     for (int fy = 0; fy < frame.height; fy++) {
         int py = y + fy;
@@ -20,9 +20,8 @@ static void draw_frame(const CursorFrame& frame, int x, int y) {
 
             uint32_t pixel = frame.pixels[fy * frame.width + fx];
             uint8_t alpha = (pixel >> 24) & 0xFF;
-            if (alpha == 0) continue; // pixel transparente
+            if (alpha == 0) continue;
 
-            // alpha blending simples: mistura com o fundo
             uint32_t bg = framebuffer[py * fb_width + px];
             uint8_t r = ((pixel >> 16 & 0xFF) * alpha + (bg >> 16 & 0xFF) * (255 - alpha)) / 255;
             uint8_t g = ((pixel >> 8 & 0xFF) * alpha + (bg >> 8 & 0xFF) * (255 - alpha)) / 255;
@@ -48,7 +47,6 @@ void cursor_show(Cursor* cur) {
 
 void cursor_hide(Cursor* cur) {
     if (!cur || !cur->visible) return;
-    // redesenha fundo preto (ou cor HAL)
     CursorFrame clear_frame = cur->frames[cur->current_frame];
     for (int fy = 0; fy < clear_frame.height; fy++)
         for (int fx = 0; fx < clear_frame.width; fx++)
